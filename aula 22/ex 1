@@ -1,0 +1,70 @@
+#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
+using namespace std;
+
+struct Node {
+    map<char, Node*> children;
+    int startIndex; 
+
+    Node() : startIndex(-1) {}// vai pegar a chave que é a letra eo valor que é o nó  
+};// e assim procuramos e guardamos cada elemento
+
+class SuffixTree {
+private:
+    Node* root;
+    string text;
+
+public:
+    SuffixTree(string s) {
+        text = s + "$"; 
+        root = new Node();
+        build();
+    }
+
+    void build() {
+        int n = text.size();
+        for (int i = 0; i < n; i++) {
+            insertSuffix(i);
+        }
+    }
+
+    void insertSuffix(int start) {
+        Node* cur = root;
+        for (int i = start; i < text.size(); i++) {
+            char c = text[i];
+            if (cur->children.find(c) == cur->children.end()) {
+                cur->children[c] = new Node();
+            }
+            cur = cur->children[c];
+        }
+        cur->startIndex = start; 
+    }
+
+    void print(Node* node, string prefix = "") {
+        if (node->startIndex != -1) {
+            cout << "sufixo começa em indice " << node->startIndex 
+                 << " -> " << text.substr(node->startIndex) << endl;
+        }
+        for (auto &p : node->children) {
+            print(p.second, prefix + p.first);
+        }
+    }
+
+    void printTree() {
+        print(root);
+    }
+};
+
+int main() {
+    cout << "arvore de sufixos para BANANA:\n";
+    SuffixTree tree1("BANANA");
+    tree1.printTree();
+
+    cout << "\narvore de sufixos para ABRACADABRA:\n";
+    SuffixTree tree2("ABRACADABRA");
+    tree2.printTree();
+
+    return 0;
+}
